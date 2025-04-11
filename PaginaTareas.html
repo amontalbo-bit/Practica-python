@@ -1,0 +1,73 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Gestor de Tareas</title>
+  <link rel="stylesheet" href="PaginaTareas.css">
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Mis Tareas</h1>
+
+    <form id="formulario-tarea">
+      <input type="text" id="nueva-tarea" placeholder="Escribe una tarea..." required />
+      <button type="submit">Agregar</button>
+    </form>
+
+    <ul id="lista-tareas"></ul>
+  </div>
+  <script>
+    const lista = document.getElementById("lista-tareas");
+    const formulario = document.getElementById("formulario-tarea");
+    const input = document.getElementById("nueva-tarea");
+  
+    let tareas = JSON.parse(localStorage.getItem("tareas")) || [];
+  
+    function renderizarTareas() {
+      lista.innerHTML = "";
+      tareas.forEach((tarea, index) => {
+        const li = document.createElement("li");
+        li.className = tarea.completada ? "hecha" : "";
+  
+        li.innerHTML = `
+        ${tarea.completada ? "" : "Sin hacer: "} ${tarea.texto}
+            <div>
+                <button onclick="marcar(${index})">Hecha</button>
+                <button onclick="eliminar(${index})">Borrar</button>
+            </div>
+            `;
+        lista.appendChild(li);
+      });
+    }
+  
+    function agregarTarea(texto) {
+      tareas.push({ texto, completada: false });
+      guardarYRenderizar();
+    }
+  
+    function marcar(index) {
+      tareas[index].completada = !tareas[index].completada;
+      guardarYRenderizar();
+    }
+  
+    function eliminar(index) {
+      tareas.splice(index, 1);
+      guardarYRenderizar();
+    }
+  
+    function guardarYRenderizar() {
+      localStorage.setItem("tareas", JSON.stringify(tareas));
+      renderizarTareas();
+    }
+  
+    formulario.addEventListener("submit", e => {
+      e.preventDefault();
+      if (input.value.trim() !== "") {
+        agregarTarea(input.value);
+        input.value = "";
+      }
+    });
+  
+    renderizarTareas(); // inicial
+  </script>
+</body>
+</html>
